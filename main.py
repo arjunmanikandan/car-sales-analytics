@@ -1,29 +1,27 @@
-#To display expensive car purchases by customers
+#To display highest car sales volume by each company
 import pandas as pd
 from tabulate import tabulate
-import sys
 
 def read_input(csv_path):
     df = pd.read_csv(csv_path)
     return df
 
 def process_input(car_sales_data):
-    sorted_df = car_sales_data.sort_values(by="Price($)",ascending=False)
-    return sorted_df
+    car_sales_data= car_sales_data.groupby("Company")["Price($)"].sum()
+    # Reset index and rename columns to avoid Companies as index labels
+    car_sales_data = car_sales_data.reset_index()
+    car_sales_data = car_sales_data.rename(columns = {'Price($)': 'TOTAL_REVENUE($)'})
+    return car_sales_data
 
-def display_output(customer_purchases,customer_count):
-    customer_purchases = customer_purchases.head(customer_count)
-    print(tabulate(customer_purchases[["Customer_Name","Price($)"]].values.tolist(),
-    headers=["CUSTOMER_NAME","CAR_PRICE"],tablefmt="grid"))
-
+def display_output(customer_purchases):
+    print(tabulate(customer_purchases.values.tolist(),
+    headers=list(customer_purchases),tablefmt="grid"))
+    
 def main():
     csv_path = "car_sales.csv"
-    # Display number of customers based on user input
-    cli_input= sys.argv
-    customer_count = int(cli_input[1])
     car_sales_data = read_input(csv_path)
-    customer_purchases = process_input(car_sales_data)
-    display_output(customer_purchases,customer_count)
+    company_sales = process_input(car_sales_data)
+    display_output(company_sales)
 
 if __name__ == "__main__":
     main()
