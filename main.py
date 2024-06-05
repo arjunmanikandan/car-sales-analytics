@@ -1,4 +1,4 @@
-#To generate Count,Total or Average of car sales based on user input.
+#To generate Total Customer Count and sort in desc order
 import sys
 import pandas as pd
 from tabulate import tabulate
@@ -9,13 +9,13 @@ def read_input(csv_path):
 
 def calc_report(user_query):
     generated_report = user_query["car_sales"].agg(user_query["report"]).reset_index()
-    generated_report = generated_report.rename(columns={"Price($)": user_query['col_name']})
+    generated_report = generated_report.rename(columns={"Car_id": user_query['col_name']}).sort_values(by=user_query["col_name"],ascending=False).head()
     return generated_report
 
 def process_input(user_query):
-    user_query["car_sales"] =  user_query["data"].groupby(user_query["field_name"])["Price($)"]
-    output = calc_report(user_query)
-    return output
+    user_query["car_sales"] =  user_query["data"].groupby(user_query["field_name"])["Car_id"]
+    customer_count = calc_report(user_query)
+    return customer_count
 
 def display_output(customer_purchases):
     print(tabulate(customer_purchases.values.tolist(),
@@ -23,7 +23,7 @@ def display_output(customer_purchases):
 
 def main():
     #User Input:Field Name ReportToGenerate NewColumnName 
-    # sample Company sum/mean/count coln_name
+    # sample Customer_Name count TOTAL_NO_OF_PERSONS
     field_name = sys.argv[1]
     report_to_generate = sys.argv[2]
     col_rename = sys.argv[3]
